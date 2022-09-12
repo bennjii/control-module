@@ -1,36 +1,28 @@
 [package]
-authors = ["UnRealReincarlution <benwhite2413@gmail.com>"]
-edition = "2018"
-readme = "README.md"
 name = "control-module"
 version = "0.1.0"
+authors = ["bennjii"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cortex-m = "0.6.0"
-cortex-m-rt = "0.6.10"
-cortex-m-semihosting = "0.3.3"
-panic-halt = "0.2.0"
+cortex-m = "=0.7.6"
+cortex-m-rt = "0.7.1"
+nrf52840-hal = "0.15.1"
+defmt = { git = "https://github.com/knurling-rs/defmt", branch = "main" }
+defmt-rtt = { git = "https://github.com/knurling-rs/defmt", branch = "main" }
 
-# Uncomment for the panic example.
-# panic-itm = "0.4.1"
+[features]
+# set logging levels here
+default = [
+  "defmt-default",
+]
 
-# Uncomment for the allocator example.
-# alloc-cortex-m = "0.4.0"
-
-# Uncomment for the device example.
-# Update `memory.x`, set target to `thumbv7em-none-eabihf` in `.cargo/config`,
-# and then use `cargo build --examples device` to build it.
-# [dependencies.stm32f3]
-# features = ["stm32f303", "rt"]
-# version = "0.7.1"
-
-# this lets you use `cargo fix`!
-[[bin]]
-name = "control-module"
-test = false
-bench = false
-
-[profile.release]
-codegen-units = 1 # better optimizations
-debug = true # symbols are nice and they don't increase the size on Flash
-lto = true # better optimizations
+# do NOT modify these features
+defmt-default = []
+defmt-trace = []
+defmt-debug = []
+defmt-info = []
+defmt-warn = []
+defmt-error = []

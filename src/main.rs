@@ -1,23 +1,34 @@
-#![no_std]
 #![no_main]
+#![no_std]
 
-// pick a panicking behavior
-use panic_halt as _; // you can put a breakpoint on `rust_begin_unwind` to catch panics
-// use panic_abort as _; // requires nightly
-// use panic_itm as _; // logs messages over ITM; requires ITM support
-// use panic_semihosting as _; // logs messages to the host stderr; requires a debugger
+use defmt_rtt as _; // global logger
+use nrf52840_hal as _; // memory layout
 
-use cortex_m::asm;
-use cortex_m_rt::entry;
-use cortex_m_semihosting::{debug, hprintln};
+use nrf52840_hal::pac::Peripherals;
+use nrf52840_hal::temp::Temp;
 
-#[entry]
+#[cortex_m_rt::entry]
 fn main() -> ! {
-    // asm::nop(); // To not have main optimize to abort in release mode, remove when you add code
-    hprintln!("Hello, world!").unwrap();
+    defmt::info!("Hello, World!");
 
-    // NOTE do not run this on hardware; it can corrupt OpenOCD state
-    debug::exit(debug::EXIT_SUCCESS);
+    let peripherals = Peripherals::take().unwrap();
 
-    loop {}
+    let mut temp_sensor = Temp::new(peripherals.TEMP);
+
+    let die_temp_c: i32 = temp_sensor.measure().to_num();
+    defmt::info!("processor temp is {}°C", die_temp_c);
+
+    exit();
+}
+
+#[panic_handler]
+fn panic(_info: &core::panic::PanicInfo) -> ! {
+    defmt::error!("panicked");
+    exit()
+}
+
+pub fn exit() -> ! {
+    loop {
+        cortex_m::asm::bkpt();
+    }
 }
